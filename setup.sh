@@ -1,48 +1,55 @@
 #!/bin/sh
 
 data_file="softwares.data"
+software_dir="$HOME/.local/bin"
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+WHITE='\033[0;37m'
+NC='\033[0m' # No Color
 
 # utils
 say(){
 	printf "$1" >&2
 }
 
+info(){
+	say "${WHITE}Info: $1${NC}\n"
+}
+
+warn(){
+	say "${YELLOW}Warning: $1${NC}\n"
+}
+
+error(){
+	say "${RED}Error: $1${NC}\n"
+	exit 1
+}
+
+ensure_dir(){
+	local dir="$1"
+	if ! [ -d "$dir" ]; then
+		mkdir -p "$dir"
+	fi
+}	
+
 get_distro(){
 	if ! [ -f /etc/os-release ]; then
-		say "No distro info\n"
-		exit 1
+		error "No distro info"
 	fi
 	echo $(grep '^NAME=' /etc/os-release | cut -d'=' -f2 | tr -d '"' | sed 's/ /_/g')
 }
-
-# get_package_manager(){
-# 	local distro=$(get_distro)
-# 	case "$distro" in
-# 		"Ubuntu" | "Debian")
-# 			echo apt-get
-# 		;;
-# 		"Arch Linux")
-# 			echo pacman
-# 		;;
-# 		*)
-# 			echo "Not support distro: $distro" >&2
-# 			exit 1
-# 		;;
-# 	esac
-# }
 
 distro_update_prefix(){
 	local distro="$1"
 	case "$distro" in
 		"Ubuntu" | "Debian")
-			echo "apt-get update"
+			echo "apt-get update -q"
 		;;
 		"Arch_Linux")
-			echo "pacman -Sy"
+			echo "pacman -Sy --quiet"
 		;;
 		*)
-			say "Not support distro: $distro\n"
-			exit 1
+			error "Not support distro: $distro"
 		;;
 	esac
 }
@@ -54,11 +61,10 @@ distro_install_prefix(){
 			echo "apt-get install -y"
 		;;
 		"Arch_Linux")
-			echo "pacman -S --noconfirm"
+			echo "pacman -S --noconfirm --needed"
 		;;
 		*)
-			say "Not support distro: $distro\n"
-			exit 1
+			error "Not support distro: $distro"
 		;;
 	esac
 }
@@ -73,15 +79,14 @@ distro_info_prefix(){
 			echo "pacman -Si"
 		;;
 		*)
-			say "Not support distro: $distro\n"
-			exit 1
+			error "Not support distro: $distro"
 		;;
 	esac
 }
  
 get_package_version(){
 	local software="$1"
-	local distro=$(get_distro)
+	local distro="$2"
 	local info_prefix=$(distro_info_prefix "$distro")
 	case "$distro" in
 		*)
@@ -92,6 +97,27 @@ get_package_version(){
 
 # utils for this particular script
 
+uncompress_file(){
+	local file="$1"
+	case "$file" in
+		*.tar.gz|*.tgz)
+			tar -xzf "$file" -C ${file%.*}
+			;;
+		*.zip)
+			unzip "$file" -d ${file%.*}
+			;;
+		*)
+			warn "Not a compressed file: $file"
+			;;
+	esac
+}
+
+get_suffix(){
+	local file="$1"
+	local delim="$2"
+	echo "${file##*$delim}"
+}
+
 # return empty string if not found
 get_record_value_when(){
 	local file="$1"
@@ -99,8 +125,7 @@ get_record_value_when(){
 	local when_field="$3"
 	local when_value="$4"
 	if ! [ -f "$file" ]; then
-		say "No data file: $file\n"
-		exit 1
+		error "No data file: $file"
 	fi
 	echo $(awk -F'[[:space:]]+' -v wf="$when_field" -v wv="$when_value" -v qf="$query_field" '
 		NR == 1 { 
@@ -204,21 +229,32 @@ check_version_meet_requirement(){
 
 install_package(){
 	local software="$1"
-	local package_version=$(get_package_version "$software")
+	local distro="$(get_distro)"
+	local package_version=$(get_package_version "$software" "$distro")
 	local required_version=$(get_required_version "$software" "$data_file")
+	local external_link=$(get_record_value_when "$data_file" "link" "name" "$software")
 	if [ -z "$required_version" ]; then
-		say "No required version for $software, skip version check\n"
+		warn "No required version for $software, skip version check"
 		required_version=">=0.0.0"
 	fi
 	if check_version_meet_requirement "$package_version" "$required_version"; then
-		say "$software version $package_version meets requirement $required_version, install from package manager\n"
-		distro="$(get_distro)"
+		info "$software version $package_version meets requirement $required_version, install from package manager"
 		package_name="$(get_required_package_name "$software" "$data_file" "$distro")"
 		install_cmd="$(distro_install_prefix "$distro") $package_name"
-		say "Running command: $install_cmd\n"
+		info "Running command: $install_cmd"
 		sudo $install_cmd
+	elif [ -n "$external_link" ]; then
+		info "$software version $package_version does not meet requirement $required_version, installing from external link"
+		ensure_dir "$software_dir"
+		file_name=$(get_suffix "$external_link" "/")
+		info "Downloading from $external_link to $software_dir/$file_name"
+		curl -L "$external_link" -o "$software_dir/$file_name"
+		if [ $? -ne 0 ]; then
+			error "Download $software failed"
+		fi
+		uncompress_file "$software_dir/$file_name"
 	else
-		say "$software version $package_version does not meet requirement $required_version, installing from external link\n"
+		error "$software version $package_version does not meet requirement $required_version, and no external link provided"
 	fi
 }
 
@@ -243,6 +279,7 @@ select_proxy_software(){
 	esac
 }
 
+sudo $(distro_update_prefix $(get_distro))
 proxy=$(select_proxy_software)
 say "Selected proxy: $proxy\n"
 install_package "$proxy"
