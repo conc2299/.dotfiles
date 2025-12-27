@@ -1,3 +1,4 @@
-name	    version		link																				Ubuntu	    Arch_Linux
-v2ray	    >=5.37.0	https://github.com/v2fly/v2ray-core/releases/download/v5.42.0/v2ray-linux-64.zip	v2ray	    v2ray
-coreutils	<=10.37.0	/	                                                                                coreutils	coreutils
+name	    version		link																				                        Ubuntu	    Arch_Linux
+v2ray	    >=5.37.0	https://github.com/v2fly/v2ray-core/releases/download/v5.42.0/v2ray-linux-64.zip	                        v2ray	    v2ray
+mihomo-tui  /           https://github.com/potoo0/mihomo-tui/releases/download/v0.2.1/mihomo-tui-Linux-gnu-x86_64.tar.gz            /           /
+mihomo      /           https://github.com/MetaCubeX/mihomo/releases/download/v1.19.18/mihomo-linux-amd64-compatible-v1.19.18.gz    /           /

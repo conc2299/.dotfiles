@@ -1,0 +1,11 @@
+# Mihomo external controller URL, Required
+mihomo-api: http://127.0.0.1:9090
+
+# Mihomo external controller secret, Optional
+#mihomo-secret:
+
+# Log file, Optional, write log only if exists
+log-file: /tmp/mihomo-tui.log
+
+# Log level(silent/trace/debug/info/warning/error), Optional, default is error.
+log-level: error

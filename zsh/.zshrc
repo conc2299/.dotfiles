@@ -30,15 +30,17 @@ alias ll="ls --color -al"
 alias grep="grep --color=auto"
 # End Alias
 
+# source files
+. $HOME/.config/zsh/sourcefile
+
 # Proxy
 function setproxy(){
-	export http_proxy=socks5://127.0.0.1:10808
-	export https_proxy=socks5://127.0.0.1:10808
-	export ftp_proxy=socks5://127.0.0.1:10808
+	export http_proxy=http://127.0.0.1:7890
+	export https_proxy=https://127.0.0.1:7890
 }
 
 function unsetproxy(){
-	unset http_proxy https_proxy ftp_proxy
+	unset http_proxy https_proxy
 }
 # End proxy
 
