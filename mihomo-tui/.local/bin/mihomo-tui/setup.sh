@@ -26,7 +26,7 @@ compare_semver() {
 }
 if [ $(compare_semver "$(getconf GNU_LIBC_VERSION | cut -d' ' -f2)" "2.39") -lt 0 ]; then
     mihomo-tui() {
-        LD_LIBRARY_PATH=$HOME/.local/bin/mihomo-tui $HOME/.local/bin/mihomo-tui/mihomo-tui "$@"
+        LD_LIBRARY_PATH=$HOME/.local/bin/mihomo-tui $HOME/.local/bin/mihomo-tui/ld-linux-x86-64.so.2 $HOME/.local/bin/mihomo-tui/mihomo-tui "$@"
     }
 else
     PATH=$HOME/.local/bin/mihomo-tui:$PATH
