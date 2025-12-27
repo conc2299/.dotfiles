@@ -40,10 +40,10 @@ case $proxy in
         install_package mihomo
         chmod +x "$HOME/.local/bin/mihomo/mihomo"
         install_package mihomo-tui
-        add_source "bash" "$HOME/.local/bin/mihomo/setup.sh"
-        add_source "zsh" "$HOME/.local/bin/mihomo/setup.sh"
-        add_source "bash" "$HOME/.local/bin/mihomo-tui/setup.sh"
-        add_source "zsh" "$HOME/.local/bin/mihomo-tui/setup.sh"
+        add_source "bash" '$HOME/.local/bin/mihomo/setup.sh'
+        add_source "zsh" '$HOME/.local/bin/mihomo/setup.sh'
+        add_source "bash" '$HOME/.local/bin/mihomo-tui/setup.sh'
+        add_source "zsh" '$HOME/.local/bin/mihomo-tui/setup.sh'
         stow "mihomo-tui"
 		stow "mihomo"
         ;;
