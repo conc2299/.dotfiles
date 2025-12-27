@@ -1,5 +1,15 @@
 PATH=$HOME/.local/bin/mihomo:$PATH
 
+set_proxy(){
+    export http_proxy="http://127.0.0.1:7890"
+    export https_proxy="http://127.0.0.1:7890"
+}
+
+unset_proxy(){
+    unset http_proxy
+    unset https_proxy
+}
+
 update_proxy_subscription(){
     if [ -z "$1" ]; then
         echo "Usage: update_proxy_subscription <subscription_url>"
