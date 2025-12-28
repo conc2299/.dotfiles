@@ -6,6 +6,13 @@
 
 # config
 
+# make user systemd
+# check if it is a systemd system
+if ! pidof systemd >/dev/null 2>&1; then
+	error "Systemd is not running. Exiting."
+fi
+ensure_dir "$HOME/.config/systemd/user"
+
 # proxy
 select_proxy_software(){
 	say "Choose proxy:\n1) v2ray\n2) clash\n3) mihomo\n"

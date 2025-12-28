@@ -32,3 +32,11 @@ Please install stow(a symlink manager)
 ```
     stow -D <module_name>
 ```
+
+
+## Softwares
+
+### Proxy (mihomo)
+Using systemd to run proxy background.
+Using [mihomo-tui](https://github.com/potoo0/mihomo-tui) as the front-end manager.
+The RESTful API for management listening at port 9090.

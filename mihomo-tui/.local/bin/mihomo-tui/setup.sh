@@ -30,6 +30,5 @@ if [ $(compare_semver "$(getconf GNU_LIBC_VERSION | cut -d' ' -f2)" "2.39") -lt 
     }
 else
     PATH=$HOME/.local/bin/mihomo-tui:$PATH
-    unset -f mihomo-tui
 fi
 unset -f compare_semver

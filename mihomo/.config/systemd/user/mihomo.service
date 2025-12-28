@@ -1,0 +1,13 @@
+[Unit]
+Description=Mihomo proxy
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStartPre=/usr/bin/sleep 1s
+ExecStart=%h/.local/bin/mihomo/mihomo
+
+[Install]
+WantedBy=default.target
+
